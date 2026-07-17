@@ -3,8 +3,10 @@ package com.joshua.slideremote
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
@@ -49,6 +51,14 @@ class MainActivity : AppCompatActivity() {
                     this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001
                 )
             }
+        }
+
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
         }
 
         accessibilityButton.setOnClickListener {

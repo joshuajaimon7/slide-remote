@@ -1,0 +1,12 @@
+{
+  "name": "slide-remote-server",
+  "version": "1.0.0",
+  "description": "WebSocket server that turns phone volume-button presses into slide advance/back keypresses on Mac",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

@@ -1,12 +1,17 @@
 package com.joshua.slideremote
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         val statusText = findViewById<TextView>(R.id.statusText)
         val accessibilityButton = findViewById<Button>(R.id.openAccessibilitySettingsButton)
 
-        // Remember last-used IP so you don't retype it every launch
         val prefs = getSharedPreferences("slide_remote", MODE_PRIVATE)
         ipInput.setText(prefs.getString("last_ip", ""))
 
@@ -38,8 +42,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Android requires manually enabling accessibility services in Settings —
-        // this just jumps the user straight there instead of making them hunt for it.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001
+                )
+            }
+        }
+
         accessibilityButton.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
@@ -47,7 +58,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Don't disconnect here — the accessibility service needs the socket
-        // to stay alive even after MainActivity closes.
     }
 }
